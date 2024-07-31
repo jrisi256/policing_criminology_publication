@@ -18,7 +18,7 @@ Create_Outcomes <- function(.df, .prefix, .id_col, ...) {
         .df %>%
         mutate(count = if_else(is.na({{ .id_col }}), 0, 1)) %>%
         lazy_dt() %>%
-        count(assignment_id, ..., wt = count) %>%
+        count(assignment_id, officer_id, unit, month, ..., wt = count) %>%
         as_tibble()
     
     # If no other grouping variables were provided, skip this step.
@@ -29,7 +29,7 @@ Create_Outcomes <- function(.df, .prefix, .id_col, ...) {
             lazy_dt() %>%
             filter(if_any(c(...), ~ !is.na(.x))) %>%
             pivot_wider(
-                id_cols = assignment_id,
+                id_cols = c(assignment_id, officer_id, unit, month),
                 names_from = c(...),
                 values_from = "n",
                 values_fill = 0
@@ -44,7 +44,7 @@ Create_Outcomes <- function(.df, .prefix, .id_col, ...) {
             ~ paste0(
                 .prefix, "_", str_replace_all(tolower(.x), fixed(" "), "")
             ),
-            -assignment_id
+            -c(assignment_id, officer_id, unit, month)
         )
 
     return(outcome)
@@ -84,13 +84,19 @@ stop_type <- Create_Outcomes(stop_assignments, "stops", stop_id, contact_type)
 stop_race <- Create_Outcomes(stop_assignments, "stops", stop_id, civ.race)
 stop_type_race <-
     Create_Outcomes(stop_assignments, "stops", stop_id, contact_type, civ.race)
+
 stop_outcomes <-
     reduce(
         list(stop_count, stop_type, stop_race, stop_type_race),
         full_join,
-        by = "assignment_id"
+        by = c("assignment_id", "officer_id", "unit", "month")
     ) %>%
-    mutate(across(-assignment_id, ~if_else(is.na(.x), 0, .x)))
+    mutate(
+        across(
+            -c(assignment_id, officer_id, unit, month),
+            ~if_else(is.na(.x), 0, .x)
+        )
+    )
 
 ################################################################################
 # Create arrest outcomes.
@@ -102,13 +108,19 @@ arrest_type_domestic <-
     Create_Outcomes(arrest_assignments, "arrests", arrest_id, domestic)
 arrest_race <-
     Create_Outcomes(arrest_assignments, "arrests", arrest_id, civ.race)
+
 arrest_outcomes <-
     reduce(
         list(arrest_count, arrest_type, arrest_race, arrest_type_domestic),
         full_join,
-        by = "assignment_id"
+        by = c("assignment_id", "officer_id", "unit", "month")
     ) %>%
-    mutate(across(-assignment_id, ~if_else(is.na(.x), 0, .x)))
+    mutate(
+        across(
+            -c(assignment_id, officer_id, unit, month),
+            ~if_else(is.na(.x), 0, .x)
+        )
+    )
 
 ################################################################################
 # Create use of force outcomes.
@@ -118,19 +130,25 @@ force_type <-
     Create_Outcomes(force_assignments, "force_injured", force_id, civ.injured)
 force_race <-
     Create_Outcomes(force_assignments, "force", force_id, civ.race)
+
 force_outcomes <-
     reduce(
         list(force_count, force_type, force_race),
         full_join,
-        by = "assignment_id"
+        by = c("assignment_id", "officer_id", "unit", "month")
     ) %>%
-    mutate(across(-assignment_id, ~if_else(is.na(.x), 0, .x)))
+    mutate(
+        across(
+            -c(assignment_id, officer_id, unit, month),
+            ~if_else(is.na(.x), 0, .x)
+        )
+    )
 
 outcomes <-
     reduce(
         list(stop_outcomes, arrest_outcomes, force_outcomes),
         full_join,
-        by = "assignment_id"
+        by = c("assignment_id", "officer_id", "unit", "month")
     )
 
 write_csv(outcomes, here("data_cleaning", "output", "3_outcomes.csv"))

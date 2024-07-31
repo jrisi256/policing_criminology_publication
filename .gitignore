@@ -51,4 +51,8 @@ rsconnect/
 # Data
 *.csv.gz
 *.csv
-
+*.dbf
+*.prj
+*.shp
+*.shx
+*.xml
