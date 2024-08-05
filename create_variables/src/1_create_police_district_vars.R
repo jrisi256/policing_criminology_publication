@@ -13,10 +13,7 @@ library(lubridate)
 ################################################################################
 districts_shape <-
     st_read(
-        dsn =
-            here(
-                "create_aggregate_variables", "input", "police_district_shapes"
-            ),
+        dsn = here("create_variables", "input", "police_district_shapes"),
         layer = "geo_export_427fc6e8-19e2-4435-b9e4-0566a20fa39c"
     ) %>%
     filter(dist_num != 31) %>%
@@ -25,7 +22,7 @@ districts_shape <-
 police_unit_membership_2002_2016 <-
     read_csv(
         here(
-            "create_aggregate_variables",
+            "create_variables",
             "input",
             "monthly_police_unit_membership_2002_2016.csv.gz"
         )
@@ -45,7 +42,7 @@ police_unit_membership_2002_2016 <-
 police_unit_membership_1965_2016 <-
     read_csv(
         here(
-            "create_aggregate_variables",
+            "create_variables",
             "input",
             "monthly_police_unit_membership_1965_2016.csv.gz"
         )
@@ -176,7 +173,17 @@ police_unit_shift_dep_vars <-
         white_arrests = sum(arrests_white, na.rm = T),
         white_force = sum(force_white, na.rm = T),
         other_stops = sum(stops_other, na.rm = T),
-        other_arrests = sum(arrests_other, na.rm = T)
+        other_arrests = sum(arrests_other, na.rm = T),
+        nr_stops_suspicious = sum(stops_suspicious, na.rm = T),
+        nr_stops_other = sum(stops_other, na.rm = T),
+        nr_stops_traffic = sum(stops_traffic, na.rm = T),
+        nr_stops_drug = sum(stops_drug, na.rm = T),
+        nr_stops_loitering = sum(stops_loitering, na.rm = T),
+        nr_stops_suspicious_black = sum(stops_suspicious_black, na.rm = T),
+        nr_stops_other_black = sum(stops_other_black, na.rm = T),
+        nr_stops_traffic_black = sum(stops_traffic_black, na.rm = T),
+        nr_stops_drug_black = sum(stops_drug_black, na.rm = T),
+        nr_stops_loitering_black = sum(stops_loitering_black, na.rm = T)
     ) %>%
     ungroup() %>%
     filter(
@@ -190,13 +197,7 @@ police_unit_shift_dep_vars <-
 ################################################################################
 # Family structure, immigration status, educational obtainment.
 family_immigration <-
-    read_csv(
-        here(
-            "create_aggregate_variables",
-            "input",
-            "census_family_immigration.csv"
-        )
-    )
+    read_csv(here("create_variables", "input", "census_family_immigration.csv"))
 
 colnames(family_immigration) <-
     c(
@@ -211,10 +212,7 @@ family_immigration <-
     select(-NAME)
 
 # Poverty and unemployment.
-economics <-
-    read_csv(
-        here("create_aggregate_variables", "input", "census_economics.csv")
-    )
+economics <- read_csv(here("create_variables", "input", "census_economics.csv"))
 
 colnames(economics) <-
     c("pop_16older", "labor_force", "prcnt_poverty", "GEOID", "NAME")
@@ -235,9 +233,7 @@ economics <-
 
 # Racial demographics.
 racial_demog <-
-    read_csv(
-        here("create_aggregate_variables", "input", "census_population.csv")
-    )
+    read_csv(here("create_variables", "input", "census_population.csv"))
 
 colnames(racial_demog) <-
     c("total_pop", "hispanic", "white", "black", "GEOID", "NAME")
@@ -249,9 +245,7 @@ racial_demog <-
 
 # Census tract shapes. Find the centroid of each census track in Chicago.
 census_tract_shapes <-
-    st_read(
-        here("create_aggregate_variables", "input", "census_tract_shapes")
-    ) %>%
+    st_read(here("create_variables", "input", "census_tract_shapes")) %>%
     filter(COUNTYFP == "031") %>%
     select(GEOID, NAMELSAD) %>%
     st_centroid()
@@ -310,9 +304,7 @@ census_police_district_indep_vars <-
 ################################################################################
 crime <-
     read_csv(
-        here(
-            "create_aggregate_variables", "input", "crime_police_districts.csv"
-        )
+        here("create_variables", "input", "crime_police_districts.csv")
     ) %>%
     select(district, year, month, violent_cr, property_cr) %>%
     rename(unit = district) %>%
@@ -345,13 +337,16 @@ final_police_district <-
     ) %>%
     left_join(crime, by = c("month", "year", "unit")) %>%
     mutate(
-        violent_cr_capita = violent_cr / total_pop * 1000,
-        property_cr_capita = property_cr / total_pop * 1000
+        violent_cr_capita = violent_cr / total_pop * 10000,
+        property_cr_capita = property_cr / total_pop * 10000,
+        prcnt_officer_black = prcnt_officer_black * 100,
+        white_stop_rate = white_stops / white * 10000,
+        hispanic_stop_rate = hispanic_stops / hispanic * 10000,
+        mean_years_worked_unit = mean_months_worked_unit / 12,
+        prcnt_civ_black = prcnt_civ_black * 100
     )
     
 write_csv(
     final_police_district,
-    here(
-        "create_aggregate_variables", "output", "police_district_vars_final.csv"
-    )
+    here("create_variables", "output", "1_police_district_vars_final.csv")
 )

@@ -40,6 +40,9 @@ assignments <-
                 months_from_start_sq = "d",
                 duration = "d"
             )
+    ) %>%
+    mutate(
+        assignment_id = row_number()
     )
 
 # Create start and end date times for each shift assignment.
@@ -82,8 +85,7 @@ officer_assignments_final <-
     filter(
         officer_race %in% c(paste0("officer_", c("white", "black", "hisp"))),
         rank == "POLICE OFFICER"
-    ) %>%
-    mutate(assignment_id = row_number())
+    )
 
 # Save results
 write_csv(
