@@ -24,7 +24,7 @@ Next, we create the main measures and variables used in our study. First, we cre
 
 ### Aggregate-level measures
 
-The aggregate-level measures are created using **1_create_police_district_vars.R**. We provided the publicly available Census data + Census shape files. We also provide the Chicago police beat boundaries (https://data.cityofchicago.org/Public-Safety/Boundaries-Police-Beats-current-/aerh-rz74). However, one will also need to obtain the following files from https://codeocean.com/capsule/8907164/tree/v1 in order to fully run the code:
+The aggregate-level measures are created using **1_create_police_district_vars.R**. We provided the publicly available Census data + Census shape files. We also provide the Chicago police district boundaries (https://data.cityofchicago.org/Public-Safety/Boundaries-Police-Districts-current-/fthy-xz3r). However, one will also need to obtain the following files from https://codeocean.com/capsule/8907164/tree/v1 in order to fully run the code:
 
 * **monthly_police_unit_membership_1965_2016.csv.gz**
 * **monthly_police_unit_membership_2002_2016.csv.gz**
