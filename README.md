@@ -1,6 +1,7 @@
 # Replication code for Risi & Graif 2024, "Community representation and policing: Effects on Black civilians".
 
-The Github for this code repository can be found here: https://github.com/jrisi256/policing_criminology_publication, and it will likely to be kept more up-to-date.
+* This is the code repository to allow one to replicate the results found in our paper: https://onlinelibrary.wiley.com/doi/10.1111/1745-9125.12376.
+* Our code and data can also be found on Harvard Dataverse: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/JROIJX. However, this Github repository is where one can find the most up-to-date changes.
 
 ## Step 1 - Cleaning the data
 
